@@ -148,8 +148,7 @@ public class VideoOverlay extends ViewGroup implements TextureView.SurfaceTextur
 
         // Set camera parameters
         Camera.Parameters cameraParameters = mCamera.getParameters();
-        mCamera.stopPreview(); //Apparently helps with freezing issue on some Samsung devices.
-        mCamera.unlock();
+       
     }
 
     public String Stop() throws IOException {
