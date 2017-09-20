@@ -116,17 +116,12 @@ public class VideoOverlay extends ViewGroup implements TextureView.SurfaceTextur
 
 
             mRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
-            // With audio
-            mRecorder.setAudioSource(MediaRecorder.AudioSource.CAMCORDER);
+           
             mRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
             mRecorder.setVideoFrameRate(profile.videoFrameRate);
             mRecorder.setVideoSize(profile.videoFrameWidth, profile.videoFrameHeight);
             mRecorder.setVideoEncodingBitRate(profile.videoBitRate);
-            mRecorder.setAudioEncodingBitRate(profile.audioBitRate);
-            mRecorder.setAudioChannels(profile.audioChannels);
-            mRecorder.setAudioSamplingRate(profile.audioSampleRate);
             mRecorder.setVideoEncoder(profile.videoCodec);
-            mRecorder.setAudioEncoder(profile.audioCodec);
 
             mRecorder.setOutputFile(filePath);
             mRecorder.setOrientationHint(mOrientationHint);
@@ -138,6 +133,23 @@ public class VideoOverlay extends ViewGroup implements TextureView.SurfaceTextur
             Log.e(TAG, "Could not start recording! MediaRecorder Error", e);
             throw e;
         }
+    }
+	
+	public void StartPreview() throws Exception { 
+        attachView();
+
+
+        initializeCamera();
+
+        if (mCamera == null) {
+            this.detachView();
+            throw new NullPointerException("Cannot start recording, we don't have a camera!");
+        }
+
+        // Set camera parameters
+        Camera.Parameters cameraParameters = mCamera.getParameters();
+        mCamera.stopPreview(); //Apparently helps with freezing issue on some Samsung devices.
+        mCamera.unlock();
     }
 
     public String Stop() throws IOException {
