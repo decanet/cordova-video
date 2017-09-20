@@ -23,7 +23,7 @@ import java.util.List;
 
 
 public class DecanetVideo extends CordovaPlugin {
-    private static final String TAG = "BACKGROUND_VIDEO";
+    private static final String TAG = "DECANET_VIDEO";
     private static final String ACTION_START_PREVIEW = "startpreview";
     private static final String ACTION_START_RECORDING = "startrecording";
     private static final String ACTION_STOP_RECORDING = "stop";
@@ -127,7 +127,7 @@ public class DecanetVideo extends CordovaPlugin {
                     callbackContext.success();
                 } catch (Exception e) {
                     e.printStackTrace();
-                    callbackContext.error(e.getMessage());
+                    callbackContext.error("erreur:"+e.getMessage());
                 }
             }
         });
