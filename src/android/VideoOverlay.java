@@ -49,8 +49,19 @@ public class VideoOverlay extends ViewGroup implements TextureView.SurfaceTextur
         mCameraFacing = (cameraFace.equalsIgnoreCase("FRONT") ? Camera.CameraInfo.CAMERA_FACING_FRONT : Camera.CameraInfo.CAMERA_FACING_BACK);
     }
 
-    public void Start(String filePath) throws Exception {
-        if (this.mRecordingState == RecordingState.STARTED) {
+	public void StartPreview() throws Exception { 
+        attachView();
+        initializeCamera();
+        if (mCamera == null) {
+            this.detachView();
+            throw new NullPointerException("Cannot start recording, we don't have a camera!");
+        }
+        // Set camera parameters
+        Camera.Parameters cameraParameters = mCamera.getParameters();
+    }
+	
+	public void StartRecording(String filePath) throws Exception {
+		if (this.mRecordingState == RecordingState.STARTED) {
             Log.w(TAG, "Already Recording");
             return;
         }
@@ -58,8 +69,6 @@ public class VideoOverlay extends ViewGroup implements TextureView.SurfaceTextur
         if (!TextUtils.isEmpty(filePath)) {
             this.mFilePath = filePath;
         }
-
-        attachView();
 
         if (this.mRecordingState == RecordingState.INITIALIZING) {
             this.mStartWhenInitialized = true;
@@ -70,7 +79,6 @@ public class VideoOverlay extends ViewGroup implements TextureView.SurfaceTextur
             throw new IllegalArgumentException("Filename for recording must be set");
         }
 
-        initializeCamera();
 
         if (mCamera == null) {
             this.detachView();
@@ -133,23 +141,7 @@ public class VideoOverlay extends ViewGroup implements TextureView.SurfaceTextur
             Log.e(TAG, "Could not start recording! MediaRecorder Error", e);
             throw e;
         }
-    }
-	
-	public void StartPreview() throws Exception { 
-        attachView();
-
-
-        initializeCamera();
-
-        if (mCamera == null) {
-            this.detachView();
-            throw new NullPointerException("Cannot start recording, we don't have a camera!");
-        }
-
-        // Set camera parameters
-        Camera.Parameters cameraParameters = mCamera.getParameters();
-       
-    }
+	}
 
     public String Stop() throws IOException {
         Log.d(TAG, "stopRecording called");

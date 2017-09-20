@@ -24,8 +24,8 @@ import java.util.List;
 
 public class DecanetVideo extends CordovaPlugin {
     private static final String TAG = "BACKGROUND_VIDEO";
-    private static final String ACTION_START_RECORDING = "start";
     private static final String ACTION_START_PREVIEW = "startpreview";
+    private static final String ACTION_START_RECORDING = "startrecording";
     private static final String ACTION_STOP_RECORDING = "stop";
     private static final String FILE_EXTENSION = ".mp4";
     private static final int START_REQUEST_CODE = 0;
@@ -64,7 +64,7 @@ public class DecanetVideo extends CordovaPlugin {
                     return true;
                 }
 
-                Start(this.requestArgs);
+                StartRecording(this.requestArgs);
                 return true;
             }
 			
@@ -111,46 +111,18 @@ public class DecanetVideo extends CordovaPlugin {
         }
     }
 
-    private void Start(JSONArray args) throws JSONException {
-        // params fileStorage, filename, camera, quality
+    private void StartRecording(JSONArray args) throws JSONException {
+        // params fileStorage, filename
         final String filename = args.getString(1);
-        final String cameraFace = args.getString(2);
 
         if (videoOverlay == null) {
             videoOverlay = new VideoOverlay(cordova.getActivity()); //, getFilePath());
-
-            cordova.getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    cordova.getActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-                    try {
-                        // Get screen dimensions
-                        DisplayMetrics displaymetrics = new DisplayMetrics();
-                        cordova.getActivity().getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
-
-                        // NOTE: GT-I9300 testing required wrapping view in relative layout for setAlpha to work.
-                        RelativeLayout containerView = new RelativeLayout(cordova.getActivity());
-                        containerView.addView(videoOverlay, new ViewGroup.LayoutParams(displaymetrics.widthPixels, displaymetrics.heightPixels));
-
-                        cordova.getActivity().addContentView(containerView, new ViewGroup.LayoutParams(displaymetrics.widthPixels, displaymetrics.heightPixels));
-
-                        webView.getView().setBackgroundColor(0x00000000);
-                        ((ViewGroup)webView.getView()).bringToFront();
-                    } catch (Exception e) {
-                        Log.e(TAG, "Error during preview create", e);
-                        callbackContext.error(TAG + ": " + e.getMessage());
-                    }
-                }
-            });
         }
-
-        videoOverlay.setCameraFacing(cameraFace);
-
         cordova.getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 try {
-                    videoOverlay.Start(getFilePath(filename));
+                    videoOverlay.StartRecording(getFilePath(filename));
                     callbackContext.success();
                 } catch (Exception e) {
                     e.printStackTrace();
