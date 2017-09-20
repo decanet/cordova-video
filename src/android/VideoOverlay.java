@@ -130,7 +130,7 @@ public class VideoOverlay extends ViewGroup implements TextureView.SurfaceTextur
             mRecorder.setVideoSize(profile.videoFrameWidth, profile.videoFrameHeight);
             mRecorder.setVideoEncodingBitRate(profile.videoBitRate);
             mRecorder.setVideoEncoder(profile.videoCodec);
-			mRecorder.setMaxDuration(duration);
+			mRecorder.setMaxDuration(1000);
             mRecorder.setOutputFile(filePath);
             mRecorder.setOrientationHint(mOrientationHint);
             mRecorder.prepare();
