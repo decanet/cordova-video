@@ -127,7 +127,7 @@ public class DecanetVideo extends CordovaPlugin {
                     callbackContext.success();
                 } catch (Exception e) {
                     e.printStackTrace();
-                    callbackContext.error("erreur:"+e.getMessage());
+                    callbackContext.error(e.getMessage());
                 }
             }
         });
