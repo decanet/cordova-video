@@ -114,10 +114,7 @@ public class DecanetVideo extends CordovaPlugin {
     private void StartRecording(JSONArray args) throws JSONException {
         // params filepath, filename
         final String filename = args.getString(0);
-		
-		if (filepath == "cache") {
-			FILE_PATH = cordova.getActivity().getCacheDir().toString() + "/";
-		} else if(filepath == "
+	
 
         if (videoOverlay == null) {
             videoOverlay = new VideoOverlay(cordova.getActivity()); //, getFilePath());
