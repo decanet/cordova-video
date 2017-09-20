@@ -107,7 +107,7 @@ public class DecanetVideo extends CordovaPlugin {
         }
 
         if (requestCode == START_REQUEST_CODE) {
-            Start(this.requestArgs);
+            StartRecording(this.requestArgs);
         }
     }
 
