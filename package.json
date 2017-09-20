@@ -1,0 +1,28 @@
+{
+  "name": "cordova-decanet-video",
+  "version": "1.0.0",
+  "description": "A simple Cordova/Phonegap plugin to capture video and preview background affecting app functionality.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "cordova": {
+    "id": "cordova-decanet-video",
+    "platforms": [
+      "android"
+    ]
+  },
+  "keywords": [
+    "video"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/decanet/cordova-video.git"
+  },
+  "author": "decanet",
+  "license": "GPL3",
+  "bugs": {
+    "url": "https://github.com/decanet/cordova-video/issues"
+  },
+  "homepage": "https://github.com/decanet/cordova-video"
+}

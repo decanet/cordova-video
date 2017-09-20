@@ -1,0 +1,44 @@
+<?xml version='1.0' encoding='utf-8'?>
+<plugin id="cordova-video" version="1.0.16" xmlns="http://apache.org/cordova/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android">
+  <name>cordova-decanet-video</name>
+  <description>A simple Cordova/Phonegap plugin to capture video.</description>
+  <author>Decanet</author>
+  <repo>https://github.com/decanet/cordova-video</repo>
+
+  <engines>
+    <engine name="cordova" version=">=4.0.0" />
+  </engines>
+
+  <keywords>video, background, transparent, recording, camera, cordova</keywords>
+
+  <license>GPL3</license>
+
+
+  <js-module name="decanetvideo" src="www/decanetvideo.js">
+    <clobbers target="cordova.plugins.decanetvideo" />
+  </js-module>
+
+  <platform name="android">
+
+    <config-file target="res/xml/config.xml" parent="/*">
+      <feature name="decanetvideo">
+        <param name="android-package" value="cordova.decanet.video.video"/>
+      </feature>
+    </config-file>
+
+
+    <!-- add permissions in AndroidManifest.xml file-->
+    <config-file target="AndroidManifest.xml" parent="/*">
+      <uses-permission android:name="android.permission.CAMERA" />
+      <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
+      <uses-feature android:name="android.hardware.camera" android:required="true" />
+      <uses-feature android:name="android.hardware.camera.front" android:required="false" />
+      <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
+    </config-file>
+
+    <source-file src="src/android/DecanetVideo.java" target-dir="src/cordova/decanet/video" />
+    <source-file src="src/android/CameraHelper.java" target-dir="src/cordova/decanet/video" />
+    <source-file src="src/android/VideoOverlay.java" target-dir="src/cordova/decanet/video" />
+  </platform>
+</plugin>
