@@ -27,7 +27,7 @@ public class VideoOverlay extends ViewGroup implements TextureView.SurfaceTextur
     private boolean mStartWhenInitialized = false;
 
     private String mFilePath;
-	private Integer duration;
+	private Integer mDuration;
     private int mCameraFacing = Camera.CameraInfo.CAMERA_FACING_BACK;
     private int mOrientation;
     private int mOrientationHint;
