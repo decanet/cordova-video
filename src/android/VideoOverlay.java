@@ -60,7 +60,7 @@ public class VideoOverlay extends ViewGroup implements TextureView.SurfaceTextur
         Camera.Parameters cameraParameters = mCamera.getParameters();
     }
 	
-	public void StartRecording(String filePath) throws Exception {
+	public void StartRecording(String filePath, Integer duration) throws Exception {
 		if (this.mRecordingState == RecordingState.STARTED) {
             Log.w(TAG, "Already Recording");
             return;
@@ -130,7 +130,9 @@ public class VideoOverlay extends ViewGroup implements TextureView.SurfaceTextur
             mRecorder.setVideoSize(profile.videoFrameWidth, profile.videoFrameHeight);
             mRecorder.setVideoEncodingBitRate(profile.videoBitRate);
             mRecorder.setVideoEncoder(profile.videoCodec);
-
+			if(duration > 0) {
+				mRecorder.setMaxDuration(duration);
+			}
             mRecorder.setOutputFile(filePath);
             mRecorder.setOrientationHint(mOrientationHint);
             mRecorder.prepare();
