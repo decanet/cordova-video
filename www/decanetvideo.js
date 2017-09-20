@@ -9,8 +9,8 @@ var decanetvideo = {
           window.document.body.style.opacity = 1;
         }, 23)
     },
-	startRecording : function(fileStorage, filename, successFunction, errorFunction) {
-		cordova.exec(successFunction, errorFunction, 'decanetvideo', 'startrecording', [fileStorage+filename]);
+	startRecording : function(filename, successFunction, errorFunction) {
+		cordova.exec(successFunction, errorFunction, 'decanetvideo', 'startrecording', [filename]);
 	},
     stop : function(successFunction, errorFunction) {
         cordova.exec(successFunction, errorFunction, 'decanetvideo','stop', []);
