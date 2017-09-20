@@ -1,5 +1,5 @@
 {
-  "name": "cordova-decanet-video",
+  "name": "cordova-video",
   "version": "1.0.0",
   "description": "A simple Cordova/Phonegap plugin to capture video and preview background affecting app functionality.",
   "main": "index.js",
@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "cordova": {
-    "id": "cordova-decanet-video",
+    "id": "cordova-video",
     "platforms": [
       "android"
     ]

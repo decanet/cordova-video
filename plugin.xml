@@ -22,7 +22,7 @@
 
     <config-file target="res/xml/config.xml" parent="/*">
       <feature name="decanetvideo">
-        <param name="android-package" value="cordova.decanet.video.video"/>
+        <param name="android-package" value="cordova.decanet.video.DecanetVideo"/>
       </feature>
     </config-file>
 
