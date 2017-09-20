@@ -115,7 +115,7 @@ public class DecanetVideo extends CordovaPlugin {
     private void StartRecording(JSONArray args) throws JSONException {
         // params filename, duration
         final String filename = args.getString(0);
-        final Integer duration = args.getInt(1);
+        final Integer duration = args.getInteger(1);
 	
 
         if (videoOverlay == null) {
