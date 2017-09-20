@@ -38,8 +38,8 @@ public class DecanetVideo extends CordovaPlugin {
     @Override
     public void initialize(CordovaInterface cordova, CordovaWebView webView) {
         super.initialize(cordova, webView);
-        // FILE_PATH = Environment.getExternalStorageDirectory().toString() + "/";
-        FILE_PATH = cordova.getActivity().getCacheDir().toString() + "/";
+        FILE_PATH = Environment.getExternalStorageDirectory().toString() + "/";
+        //FILE_PATH = cordova.getActivity().getCacheDir().toString() + "/";
         // FILE_PATH = cordova.getActivity().getFilesDir().toString() + "/";
         //FILE_PATH = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES).toString() + "/";
     }
@@ -113,8 +113,11 @@ public class DecanetVideo extends CordovaPlugin {
 
     private void StartRecording(JSONArray args) throws JSONException {
         // params filepath, filename
-        final String filepath = args.getString(0);
-        final String filename = args.getString(1);
+        final String filename = args.getString(0);
+		
+		if (filepath == "cache") {
+			FILE_PATH = cordova.getActivity().getCacheDir().toString() + "/";
+		} else if(filepath == "
 
         if (videoOverlay == null) {
             videoOverlay = new VideoOverlay(cordova.getActivity()); //, getFilePath());
@@ -123,7 +126,7 @@ public class DecanetVideo extends CordovaPlugin {
             @Override
             public void run() {
                 try {
-                    videoOverlay.StartRecording(filepath+filename);
+                    videoOverlay.StartRecording(getFilePath(filename));
                     callbackContext.success();
                 } catch (Exception e) {
                     e.printStackTrace();
