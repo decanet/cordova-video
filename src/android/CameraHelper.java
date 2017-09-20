@@ -1,3 +1,4 @@
+package cordova.decanet.video;
 
 import android.app.Activity;
 import android.hardware.Camera;
