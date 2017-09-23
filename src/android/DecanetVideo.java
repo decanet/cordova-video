@@ -39,10 +39,10 @@ public class DecanetVideo extends CordovaPlugin {
     @Override
     public void initialize(CordovaInterface cordova, CordovaWebView webView) {
         super.initialize(cordova, webView);
-        //FILE_PATH = Environment.getExternalStorageDirectory().toString() + "/";
+        FILE_PATH = Environment.getExternalStorageDirectory().toString() + "/";
         //FILE_PATH = cordova.getActivity().getCacheDir().toString() + "/";
 		//FILE_PATH = cordova.getActivity().getExternalCacheDir().toString() + "/";
-         FILE_PATH = cordova.getActivity().getFilesDir().toString() + "/";
+        //FILE_PATH = cordova.getActivity().getFilesDir().toString() + "/";
         //FILE_PATH = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES).toString() + "/";
     }
 
