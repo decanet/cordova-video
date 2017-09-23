@@ -27,7 +27,6 @@ public class VideoOverlay extends ViewGroup implements TextureView.SurfaceTextur
     private boolean mStartWhenInitialized = false;
 
     private String mFilePath;
-	private Integer mDuration;
     private int mCameraFacing = Camera.CameraInfo.CAMERA_FACING_BACK;
     private int mOrientation;
     private int mOrientationHint;
@@ -61,7 +60,7 @@ public class VideoOverlay extends ViewGroup implements TextureView.SurfaceTextur
         Camera.Parameters cameraParameters = mCamera.getParameters();
     }
 	
-	public void StartRecording(String filePath, Integer duration) throws Exception {
+	public void StartRecording(String filePath) throws Exception {
 		if (this.mRecordingState == RecordingState.STARTED) {
             Log.w(TAG, "Already Recording");
             return;
@@ -70,10 +69,6 @@ public class VideoOverlay extends ViewGroup implements TextureView.SurfaceTextur
         if (!TextUtils.isEmpty(filePath)) {
             this.mFilePath = filePath;
         }
-		
-		if (duration>0) {
-			this.mDuration = duration;
-		}
 
         if (this.mRecordingState == RecordingState.INITIALIZING) {
             this.mStartWhenInitialized = true;
@@ -135,9 +130,6 @@ public class VideoOverlay extends ViewGroup implements TextureView.SurfaceTextur
             mRecorder.setVideoSize(profile.videoFrameWidth, profile.videoFrameHeight);
             mRecorder.setVideoEncodingBitRate(profile.videoBitRate);
             mRecorder.setVideoEncoder(profile.videoCodec);
-			if(duration > 0) {
-				mRecorder.setMaxDuration(duration);
-			}
             mRecorder.setOutputFile(filePath);
             mRecorder.setOrientationHint(mOrientationHint);
             mRecorder.prepare();
@@ -259,7 +251,7 @@ public class VideoOverlay extends ViewGroup implements TextureView.SurfaceTextur
 
         if (mStartWhenInitialized) {
             try {
-                StartRecording(this.mFilePath, this.mDuration);
+                StartRecording(this.mFilePath);
             } catch (Exception ex) {
                 Log.e(TAG, "Error start camera", ex);
             }
