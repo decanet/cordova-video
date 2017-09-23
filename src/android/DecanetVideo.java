@@ -193,8 +193,8 @@ public class DecanetVideo extends CordovaPlugin {
             public void run() {
                 if (videoOverlay != null) {
                     try {
-                        String filepath = videoOverlay.Stop();
-                        callbackContext.success(filepath);
+                        videoOverlay.Stop();
+                        callbackContext.success();
                     } catch (IOException e) {
                         e.printStackTrace();
                         callbackContext.error(e.getMessage());
@@ -210,8 +210,8 @@ public class DecanetVideo extends CordovaPlugin {
             public void run() {
                 if (videoOverlay != null) {
                     try {
-                        videoOverlay.StopRecording();
-                        callbackContext.success();
+                        String filepath = videoOverlay.StopRecording();
+                        callbackContext.success(filepath);
                     } catch (IOException e) {
                         e.printStackTrace();
                         callbackContext.error(e.getMessage());
