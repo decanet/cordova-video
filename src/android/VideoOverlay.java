@@ -142,7 +142,15 @@ public class VideoOverlay extends ViewGroup implements TextureView.SurfaceTextur
         }
 	}
 
-    public String Stop() throws IOException {
+    public void Stop() throws IOException {
+        Log.d(TAG, "stopRecording called");
+
+        this.releaseCamera();
+        this.detachView();
+
+    }
+	
+	public String StopRecording() throws IOException {
         Log.d(TAG, "stopRecording called");
 
         if (mRecorder != null) {
@@ -155,9 +163,6 @@ public class VideoOverlay extends ViewGroup implements TextureView.SurfaceTextur
                 Log.e(TAG, "Could not stop recording.", e);
             }
         }
-
-        this.releaseCamera();
-        this.detachView();
 
         return this.mFilePath;
     }

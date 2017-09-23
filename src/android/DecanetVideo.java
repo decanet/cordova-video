@@ -26,7 +26,8 @@ public class DecanetVideo extends CordovaPlugin {
     private static final String TAG = "DECANET_VIDEO";
     private static final String ACTION_START_PREVIEW = "startpreview";
     private static final String ACTION_START_RECORDING = "startrecording";
-    private static final String ACTION_STOP_RECORDING = "stop";
+    private static final String ACTION_STOP_RECORDING = "stoprecording";
+    private static final String ACTION_STOP_PREVIEW = "stop";
     private static final String FILE_EXTENSION = ".mp4";
     private static final int START_REQUEST_CODE = 0;
 
@@ -84,7 +85,12 @@ public class DecanetVideo extends CordovaPlugin {
                 return true;
             }
 
-            if (ACTION_STOP_RECORDING.equalsIgnoreCase(action)) {
+			if (ACTION_STOP_RECORDING.equalsIgnoreCase(action)) {
+                StopRecording();
+                return true;
+            }
+			
+            if (ACTION_STOP_PREVIEW.equalsIgnoreCase(action)) {
                 Stop();
                 return true;
             }
@@ -198,6 +204,23 @@ public class DecanetVideo extends CordovaPlugin {
         });
     }
 
+	private void StopRecording() throws JSONException {
+        cordova.getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (videoOverlay != null) {
+                    try {
+                        videoOverlay.StopRecording();
+                        callbackContext.success();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        callbackContext.error(e.getMessage());
+                    }
+                }
+            }
+        });
+    }
+	
     private String getFilePath(String filename) {
         // Add number suffix if file exists
         int i = 1;
