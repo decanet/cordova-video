@@ -321,7 +321,7 @@ public class DecanetVideo extends CordovaPlugin {
         cordova.getThreadPool().execute(new Runnable() {
             public void run() {
                 try {
-                    File tempFile = File.createTempFile("ffmpeg", null, appContext.getCacheDir());
+                    File tempFile = File.createTempFile("ffmpeg", null, cordova.getActivity().getApplicationContext().getCacheDir());
                     FfmpegController ffmpegController = new FfmpegController(cordova.getActivity().getApplicationContext(), tempFile);
 
                     ArrayList<String> al = new ArrayList<String>();
