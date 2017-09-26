@@ -1,13 +1,15 @@
 package cordova.decanet.video;
 
-import android.os.Environment;
-
-import android.content.pm.PackageManager;
-import android.util.DisplayMetrics;
-import android.util.Log;
-import android.view.ViewGroup;
-import android.view.WindowManager;
-import android.widget.RelativeLayout;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.URL;
+import java.net.URLDecoder;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CallbackContext;
@@ -23,16 +25,26 @@ import org.ffmpeg.android.FfmpegController;
 import org.ffmpeg.android.Clip;
 import org.ffmpeg.android.ShellUtils.ShellCallback;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.net.URL;
-import java.net.URLDecoder;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
-import java.util.ArrayList;
-import java.util.List;
+import android.content.ContentUris;
+import android.content.Context;
+import android.content.Intent;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
+import android.database.Cursor;
+import android.media.MediaMetadataRetriever;
+import android.net.Uri;
+import android.os.Build;
+import android.os.Environment;
+import android.provider.DocumentsContract;
+import android.provider.MediaStore;
+import android.util.Log;
+import android.util.DisplayMetrics;
+import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.widget.RelativeLayout;
+
+
 
 
 public class DecanetVideo extends CordovaPlugin {
@@ -111,7 +123,7 @@ public class DecanetVideo extends CordovaPlugin {
 				try {
 					this.execFFMPEG(args);
 				} catch (IOException e) {
-					callback.error(e.toString());
+					callbackContext.error(e.toString());
 				}
 				return true;
 			}
@@ -304,14 +316,13 @@ public class DecanetVideo extends CordovaPlugin {
         Log.d(TAG, "options: " + options.toString());
 
         final JSONArray cmds = options.getJSONArray("cmd");
-        final Context appContext = cordova.getActivity().getApplicationContext();
 
         // start task
         cordova.getThreadPool().execute(new Runnable() {
             public void run() {
                 try {
                     File tempFile = File.createTempFile("ffmpeg", null, appContext.getCacheDir());
-                    FfmpegController ffmpegController = new FfmpegController(appContext, tempFile);
+                    FfmpegController ffmpegController = new FfmpegController(cordova.getActivity().getApplicationContext(), tempFile);
 
                     ArrayList<String> al = new ArrayList<String>();
                     al.add(ffmpegController.getBinaryPath());
@@ -330,7 +341,7 @@ public class DecanetVideo extends CordovaPlugin {
                                 jsonObj.put("progress", shellLine.toString());
                                 PluginResult progressResult = new PluginResult(PluginResult.Status.OK, jsonObj);
                                 progressResult.setKeepCallback(true);
-                                callback.sendPluginResult(progressResult);
+                                callbackContext.sendPluginResult(progressResult);
                             } catch (JSONException e) {
                                 Log.d(TAG, "PluginResult error: " + e);
                             }
@@ -340,10 +351,10 @@ public class DecanetVideo extends CordovaPlugin {
                     });
                     Log.d(TAG, "ffmpeg finished");
 
-                    callback.success();
+                    callbackContext.success();
                 } catch (Throwable e) {
                     Log.d(TAG, "ffmpeg exception ", e);
-                    callback.error(e.toString());
+                    callbackContext.error(e.toString());
                 }
             }
         });
