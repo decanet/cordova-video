@@ -1,4 +1,5 @@
 var cordova = require('cordova');
+var pluginName = 'DecanetVideo';
 
 var decanetvideo = {
 	startPreview : function(camera, quality, successFunction, errorFunction) {
@@ -17,7 +18,20 @@ var decanetvideo = {
 	},
     stop : function(successFunction, errorFunction) {
         cordova.exec(successFunction, errorFunction, 'decanetvideo','stop', []);
-    }
+    },
+	execFFMPEG : function(success, error, options) {
+	  var self = this;
+	  var win = function(result) {
+		if (typeof result.progress !== 'undefined') {
+		  if (typeof options.progress === 'function') {
+			options.progress(result.progress);
+		  }
+		} else {
+		  success(result);
+		}
+	  };
+		cordova.exec(win, error, 'decanetvideo', 'execFFMPEG', [options]);
+	}
 };
 
 module.exports = decanetvideo;

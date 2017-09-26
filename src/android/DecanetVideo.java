@@ -9,15 +9,28 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.RelativeLayout;
 
+import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaInterface;
-import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CordovaWebView;
+import org.apache.cordova.PluginResult;
+import org.ffmpeg.android.ShellUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
+
+import org.ffmpeg.android.FfmpegController;
+import org.ffmpeg.android.Clip;
+import org.ffmpeg.android.ShellUtils.ShellCallback;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URL;
+import java.net.URLDecoder;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -94,7 +107,14 @@ public class DecanetVideo extends CordovaPlugin {
             if (ACTION_STOP_PREVIEW.equalsIgnoreCase(action)) {
                 Stop();
                 return true;
-            }
+            } else if (action.equals("execFFMPEG")) {
+				try {
+					this.execFFMPEG(args);
+				} catch (IOException e) {
+					callback.error(e.toString());
+				}
+				return true;
+			}
 
             callbackContext.error(TAG + ": INVALID ACTION");
             return false;
@@ -256,4 +276,77 @@ public class DecanetVideo extends CordovaPlugin {
         }
         super.onDestroy();
     }
+	
+	/**
+     * execFFMPEG
+     *
+     * Executes an ffmpeg command
+     *
+     * ARGUMENTS
+     * =========
+     *
+     * cmd - ffmpeg command as a string array
+     *
+     * RESPONSE
+     * ========
+     *
+     * VOID
+     *
+     * @param JSONArray args
+     * @return void
+     */
+    private void execFFMPEG(JSONArray args) throws JSONException, IOException {
+        Log.d(TAG, "execFFMPEG firing");
+
+        // parse arguments
+        JSONObject options = args.optJSONObject(0);
+
+        Log.d(TAG, "options: " + options.toString());
+
+        final JSONArray cmds = options.getJSONArray("cmd");
+        final Context appContext = cordova.getActivity().getApplicationContext();
+
+        // start task
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                try {
+                    File tempFile = File.createTempFile("ffmpeg", null, appContext.getCacheDir());
+                    FfmpegController ffmpegController = new FfmpegController(appContext, tempFile);
+
+                    ArrayList<String> al = new ArrayList<String>();
+                    al.add(ffmpegController.getBinaryPath());
+
+                    int cmdArrLength = cmds.length();
+                    for (int i = 0; i < cmdArrLength; i++) {
+                        al.add(cmds.optString(i));
+                    }
+
+                    ffmpegController.execFFMPEG(al, new ShellUtils.ShellCallback() {
+                        @Override
+                        public void shellOut(String shellLine) {
+                            Log.d(TAG, "shellOut: " + shellLine);
+                            try {
+                                JSONObject jsonObj = new JSONObject();
+                                jsonObj.put("progress", shellLine.toString());
+                                PluginResult progressResult = new PluginResult(PluginResult.Status.OK, jsonObj);
+                                progressResult.setKeepCallback(true);
+                                callback.sendPluginResult(progressResult);
+                            } catch (JSONException e) {
+                                Log.d(TAG, "PluginResult error: " + e);
+                            }
+                        }
+                        @Override
+                        public void processComplete(int exitValue) {}
+                    });
+                    Log.d(TAG, "ffmpeg finished");
+
+                    callback.success();
+                } catch (Throwable e) {
+                    Log.d(TAG, "ffmpeg exception ", e);
+                    callback.error(e.toString());
+                }
+            }
+        });
+    }
+
 }
