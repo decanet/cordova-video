@@ -16,7 +16,6 @@ import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaInterface;
 import org.apache.cordova.CordovaWebView;
 import org.apache.cordova.PluginResult;
-import org.ffmpeg.android.ShellUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
