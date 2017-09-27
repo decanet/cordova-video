@@ -364,7 +364,7 @@ public class DecanetVideo extends CordovaPlugin {
          saveToLibrary: bool - save to gallery
          */
         
-        JSONObject options = args.optJSONObject(0);
+        /*JSONObject options = args.optJSONObject(0);
         Log.d(TAG, "options: " + options.toString());
 
         final File inFile = this.resolveLocalFileSystemURI(options.getString("fileUri"));
@@ -514,7 +514,7 @@ public class DecanetVideo extends CordovaPlugin {
                     callback.error(e.toString());
                 }
             }
-        });
+        });*/
     }
 	
 	@SuppressWarnings("deprecation")
