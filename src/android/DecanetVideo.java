@@ -53,6 +53,12 @@ public class DecanetVideo extends CordovaPlugin {
     private static final String ACTION_STOP_PREVIEW = "stop";
     private static final String FILE_EXTENSION = ".mp4";
     private static final int START_REQUEST_CODE = 0;
+	
+	private static final int M4V = 0;
+    private static final int MPEG4 = 1;
+    private static final int M4A = 2;
+    private static final int QUICK_TIME = 3;
+    private static final int GIF = 4;
 
     private String FILE_PATH = "";
     private VideoOverlay videoOverlay;
