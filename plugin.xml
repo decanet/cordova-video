@@ -37,8 +37,7 @@
       <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
     </config-file>
        
-    <!--<framework src="src/android/android-ffmpeg-java" custom="true" />-->
-    <framework src="src/android/ffmpeg4android" custom="true" />
+    <framework src="src/android/android-ffmpeg-java" custom="true" />
 
     <source-file src="src/android/DecanetVideo.java" target-dir="src/cordova/decanet/video" />
     <source-file src="src/android/CameraHelper.java" target-dir="src/cordova/decanet/video" />
