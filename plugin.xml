@@ -38,7 +38,7 @@
     </config-file>
        
     <!--<framework src="src/android/android-ffmpeg-java" custom="true" />-->
-    <framework src="src/android/ffmpeg4android_lib" custom="true" />
+    <framework src="src/android/ffmpeg4android" custom="true" />
 
     <source-file src="src/android/DecanetVideo.java" target-dir="src/cordova/decanet/video" />
     <source-file src="src/android/CameraHelper.java" target-dir="src/cordova/decanet/video" />
