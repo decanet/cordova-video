@@ -212,6 +212,12 @@ public class DecanetVideo extends CordovaPlugin {
                 if (videoOverlay != null) {
                     try {
                         String filepath = videoOverlay.StopRecording();
+						File outFile = new File(filepath);
+						if (!outFile.exists()) {
+							Log.d(TAG, "outputFile doesn't exist!");
+							callback.error("an error ocurred during recording");
+							return;
+						}
                         callbackContext.success(filepath);
                     } catch (IOException e) {
                         e.printStackTrace();
