@@ -13,10 +13,15 @@ import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaInterface;
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CordovaWebView;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
 import org.json.JSONArray;
 import org.json.JSONException;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +31,6 @@ public class DecanetVideo extends CordovaPlugin {
     private static final String TAG = "DECANET_VIDEO";
     private static final String ACTION_START_PREVIEW = "startpreview";
     private static final String ACTION_START_RECORDING = "startrecording";
-    private static final String ACTION_STOP_RECORDING = "stoprecording";
     private static final String ACTION_STOP_PREVIEW = "stop";
     private static final String FILE_EXTENSION = ".mp4";
     private static final int START_REQUEST_CODE = 0;
@@ -39,12 +43,7 @@ public class DecanetVideo extends CordovaPlugin {
     @Override
     public void initialize(CordovaInterface cordova, CordovaWebView webView) {
         super.initialize(cordova, webView);
-        //FILE_PATH = Environment.getExternalStorageDirectory().toString() + "/";
-        //FILE_PATH = cordova.getActivity().getCacheDir().toString() + "/";
-		//FILE_PATH = cordova.getActivity().getExternalCacheDir().toString() + "/";
-        FILE_PATH = cordova.getActivity().getFilesDir().toString() + "/";
-		//FILE_PATH = cordova.getActivity().getExternalFilesDir().toString() + "/";
-        //FILE_PATH = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES).toString() + "/";
+       
     }
 
 
@@ -85,11 +84,6 @@ public class DecanetVideo extends CordovaPlugin {
                 StartPreview(this.requestArgs);
                 return true;
             }
-
-			if (ACTION_STOP_RECORDING.equalsIgnoreCase(action)) {
-                StopRecording();
-                return true;
-            }
 			
             if (ACTION_STOP_PREVIEW.equalsIgnoreCase(action)) {
                 Stop();
@@ -120,18 +114,44 @@ public class DecanetVideo extends CordovaPlugin {
     }
 
     private void StartRecording(JSONArray args) throws JSONException {
-        // params filename
-        final String filename = args.getString(0);	
+        // params filename, duration
+        final String filename = args.getString(0);
+		final Integer duration = args.getInt(1);
 
         if (videoOverlay == null) {
             videoOverlay = new VideoOverlay(cordova.getActivity()); //, getFilePath());
         }
+		
+				
+		File mediaStorageDir= new File(
+                Environment.getExternalStorageDirectory() + "/Movies/",
+                "Decanet"
+        );  
+		
+		if (!mediaStorageDir.exists()) {
+            if (!mediaStorageDir.mkdir()) {
+                callbackContext.error("Can't access or make Movies directory");
+                return;
+            }
+        }
+        
+        final String outputFilePath =  new File(
+            mediaStorageDir.getPath(),
+            filename + FILE_EXTENSION
+        ).getAbsolutePath();
+			
         cordova.getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 try {
-                    videoOverlay.StartRecording(getFilePath(filename));
-                    callbackContext.success();
+					String filepath = videoOverlay.StartRecording(outputFilePath, duration);
+					File outFile = new File(filepath);
+					if (!outFile.exists()) {
+						Log.d(TAG, "outputFile doesn't exist!");
+						callbackContext.error("an error ocurred during recording");
+						return;
+					}
+					callbackContext.success(filepath);
                 } catch (Exception e) {
                     e.printStackTrace();
                     callbackContext.error(e.getMessage());
@@ -203,40 +223,6 @@ public class DecanetVideo extends CordovaPlugin {
                 }
             }
         });
-    }
-
-	private void StopRecording() throws JSONException {
-        cordova.getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (videoOverlay != null) {
-                    try {
-                        String filepath = videoOverlay.StopRecording();
-						File outFile = new File(filepath);
-						if (!outFile.exists()) {
-							Log.d(TAG, "outputFile doesn't exist!");
-							callback.error("an error ocurred during recording");
-							return;
-						}
-                        callbackContext.success(filepath);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        callbackContext.error(e.getMessage());
-                    }
-                }
-            }
-        });
-    }
-	
-    private String getFilePath(String filename) {
-        // Add number suffix if file exists
-        int i = 1;
-        String fileName = filename;
-        while (new File(FILE_PATH + fileName + FILE_EXTENSION).exists()) {
-            fileName = filename + '_' + i;
-            i++;
-        }
-        return FILE_PATH + fileName + FILE_EXTENSION;
     }
 
     //Plugin Method Overrides

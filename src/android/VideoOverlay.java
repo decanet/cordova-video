@@ -6,17 +6,17 @@ import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
 import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
+import android.media.MediaRecorder.OnInfoListener;  
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
-
 import java.io.IOException;
 
 @SuppressWarnings("deprecation")
 public class VideoOverlay extends ViewGroup implements TextureView.SurfaceTextureListener {
-    private static final String TAG = "BACKGROUND_VID_OVERLAY";
+    private static final String TAG = "DECANET_OVERLAY";
     private RecordingState mRecordingState = RecordingState.INITIALIZING;
 
     private int mCameraId = CameraHelper.NO_CAMERA;
@@ -30,6 +30,7 @@ public class VideoOverlay extends ViewGroup implements TextureView.SurfaceTextur
     private int mCameraFacing = Camera.CameraInfo.CAMERA_FACING_BACK;
     private int mOrientation;
     private int mOrientationHint;
+	private int mDuration;
 
     public VideoOverlay(Context context) {
         super(context);
@@ -59,11 +60,11 @@ public class VideoOverlay extends ViewGroup implements TextureView.SurfaceTextur
         // Set camera parameters
         Camera.Parameters cameraParameters = mCamera.getParameters();
     }
-	
-	public void StartRecording(String filePath) throws Exception {
+
+	public String StartRecording(String filePath, int duration) throws Exception {
 		if (this.mRecordingState == RecordingState.STARTED) {
             Log.w(TAG, "Already Recording");
-            return;
+            throw new NullPointerException("Already Recording!");
         }
 
         if (!TextUtils.isEmpty(filePath)) {
@@ -72,7 +73,6 @@ public class VideoOverlay extends ViewGroup implements TextureView.SurfaceTextur
 
         if (this.mRecordingState == RecordingState.INITIALIZING) {
             this.mStartWhenInitialized = true;
-            return;
         }
 
         if (TextUtils.isEmpty(mFilePath)) {
@@ -84,6 +84,8 @@ public class VideoOverlay extends ViewGroup implements TextureView.SurfaceTextur
             this.detachView();
             throw new NullPointerException("Cannot start recording, we don't have a camera!");
         }
+		
+		this.mDuration = duration;
 
         // Set camera parameters
         Camera.Parameters cameraParameters = mCamera.getParameters();
@@ -130,11 +132,30 @@ public class VideoOverlay extends ViewGroup implements TextureView.SurfaceTextur
             mRecorder.setVideoSize(profile.videoFrameWidth, profile.videoFrameHeight);
             mRecorder.setVideoEncodingBitRate(profile.videoBitRate);
             mRecorder.setVideoEncoder(profile.videoCodec);
+			if(duration>0) {
+				mRecorder.setMaxDuration(duration);
+			}
+			mRecorder.setOnInfoListener(new OnInfoListener() {  
+                    @Override  
+                    public void onInfo(MediaRecorder mr, int what, int extra) {  
+                        if (what == mRecorder.MEDIA_RECORDER_INFO_MAX_DURATION_REACHED) {  
+                            if (mRecorder != null) {  
+                                mRecorder.stop();  
+								mRecorder.reset();
+                                mRecorder.release();  
+                                mRecorder = null;  
+								mRecordingState = RecordingState.STOPPED;
+                            }  
+                        }  
+                    }  
+                });  
             mRecorder.setOutputFile(filePath);
             mRecorder.setOrientationHint(mOrientationHint);
             mRecorder.prepare();
             Log.d(TAG, "Starting recording");
+            Log.d(TAG, "Quality: size="+profile.videoFrameWidth+"x"+profile.videoFrameHeight);
             mRecorder.start();
+			return filePath;
         } catch (Exception e) {
             this.releaseCamera();
             Log.e(TAG, "Could not start recording! MediaRecorder Error", e);
@@ -148,23 +169,6 @@ public class VideoOverlay extends ViewGroup implements TextureView.SurfaceTextur
         this.releaseCamera();
         this.detachView();
 
-    }
-	
-	public String StopRecording() throws IOException {
-        Log.d(TAG, "stopRecording called");
-
-        if (mRecorder != null) {
-            MediaRecorder tempRecorder = mRecorder;
-            mRecorder = null;
-            try {
-                tempRecorder.stop();
-            } catch (Exception e) {
-                //This can occur when the camera failed to start and then stop is called
-                Log.e(TAG, "Could not stop recording.", e);
-            }
-        }
-
-        return this.mFilePath;
     }
 
     @Override
@@ -256,7 +260,7 @@ public class VideoOverlay extends ViewGroup implements TextureView.SurfaceTextur
 
         if (mStartWhenInitialized) {
             try {
-                StartRecording(this.mFilePath);
+                StartRecording(this.mFilePath, this.mDuration);
             } catch (Exception ex) {
                 Log.e(TAG, "Error start camera", ex);
             }
