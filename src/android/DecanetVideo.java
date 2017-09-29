@@ -19,6 +19,12 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import org.json.JSONArray;
 import org.json.JSONException;
 
+import org.ffmpeg.android.ShellUtils;
+import org.ffmpeg.android.FfmpegController;
+import org.ffmpeg.android.Clip;
+import org.ffmpeg.android.ShellUtils.ShellCallback;
+import org.apache.cordova.PluginResult;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -88,7 +94,14 @@ public class DecanetVideo extends CordovaPlugin {
             if (ACTION_STOP_PREVIEW.equalsIgnoreCase(action)) {
                 Stop();
                 return true;
-            }
+            } else if (action.equals("execFFMPEG")) {
+				try {
+					this.execFFMPEG(args);
+				} catch (IOException e) {
+					callbackContext.error(e.toString());
+				}
+				return true;
+			}
 
             callbackContext.error(TAG + ": INVALID ACTION");
             return false;
@@ -98,6 +111,59 @@ public class DecanetVideo extends CordovaPlugin {
         }
 
         return true;
+    }
+	
+	private void execFFMPEG(JSONArray args) throws JSONException, IOException {
+        Log.d(TAG, "execFFMPEG firing");
+
+        // parse arguments
+        JSONObject options = args.optJSONObject(0);
+
+        Log.d(TAG, "options: " + options.toString());
+
+        final JSONArray cmds = options.getJSONArray("cmd");
+
+        // start task
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                try {
+                    File tempFile = File.createTempFile("ffmpeg", null, cordova.getActivity().getApplicationContext().getCacheDir());
+                    FfmpegController ffmpegController = new FfmpegController(cordova.getActivity().getApplicationContext(), tempFile);
+
+                    ArrayList<String> al = new ArrayList<String>();
+                    al.add(ffmpegController.getBinaryPath());
+
+                    int cmdArrLength = cmds.length();
+                    for (int i = 0; i < cmdArrLength; i++) {
+                        al.add(cmds.optString(i));
+                    }
+
+                    ffmpegController.execFFMPEG(al, new ShellUtils.ShellCallback() {
+                        @Override
+                        public void shellOut(String shellLine) {
+                            Log.d(TAG, "shellOut: " + shellLine);
+                            try {
+                                JSONObject jsonObj = new JSONObject();
+                                jsonObj.put("progress", shellLine.toString());
+                                PluginResult progressResult = new PluginResult(PluginResult.Status.OK, jsonObj);
+                                progressResult.setKeepCallback(true);
+                                callbackContext.sendPluginResult(progressResult);
+                            } catch (JSONException e) {
+                                Log.d(TAG, "PluginResult error: " + e);
+                            }
+                        }
+                        @Override
+                        public void processComplete(int exitValue) {}
+                    });
+                    Log.d(TAG, "ffmpeg finished");
+
+                    callbackContext.success();
+                } catch (Throwable e) {
+                    Log.d(TAG, "ffmpeg exception ", e);
+                    callbackContext.error(e.toString());
+                }
+            }
+        });
     }
 
     public void onRequestPermissionResult(int requestCode, String[] permissions, int[] grantResults) throws JSONException {
@@ -144,14 +210,7 @@ public class DecanetVideo extends CordovaPlugin {
             @Override
             public void run() {
                 try {
-					String filepath = videoOverlay.StartRecording(outputFilePath, duration);
-					File outFile = new File(filepath);
-					if (!outFile.exists()) {
-						Log.d(TAG, "outputFile doesn't exist!");
-						callbackContext.error("an error ocurred during recording");
-						return;
-					}
-					callbackContext.success(filepath);
+					videoOverlay.StartRecording(outputFilePath, duration, callbackContext);
                 } catch (Exception e) {
                     e.printStackTrace();
                     callbackContext.error(e.getMessage());
