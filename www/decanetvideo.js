@@ -29,7 +29,7 @@ var decanetvideo = {
 		  success(result);
 		}
 	  };
-	  exec(win, error, pluginName, 'execFFMPEG', [options]);
+	  cordova.exec(win, error, 'decanetvideo', 'execFFMPEG', [options]);
 	}
 };
 
