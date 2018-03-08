@@ -1,4 +1,5 @@
 var cordova = require('cordova');
+var exec = require('cordova/exec')
 
 var decanetvideo = {
 	startPreview : function(camera, quality, successFunction, errorFunction) {
@@ -29,7 +30,7 @@ var decanetvideo = {
 		  success(result);
 		}
 	  };
-	  cordova.exec(win, error, 'decanetvideo', 'execFFMPEG', [options]);
+	  exec(win, error, 'decanetvideo', 'execFFMPEG', [options]);
 	}
 };
 
